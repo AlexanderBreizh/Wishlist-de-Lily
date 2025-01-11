@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wishlist de Lily</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            margin-top: 50px;
+            font-size: 3em;
+            color: #333;
+        }
+        .wishlist {
+            margin: 20px auto;
+            width: 80%;
+            max-width: 600px;
+            text-align: left;
+        }
+        .wishlist-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        .password-section {
+            margin: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Wishlist de Lily</h1>
+
+    <div class="password-section">
+        <label for="password">Je suis Lily:</label>
+        <input type="password" id="password" placeholder="Mot de passe">
+        <button onclick="checkPassword()">Valider</button>
+    </div>
+
+    <div id="wishlist-section" class="wishlist">
+        <!-- Wishlist items will be displayed here -->
+    </div>
+
+    <div id="edit-section" class="hidden">
+        <h3>Modifier la wishlist</h3>
+        <input type="text" id="new-item" placeholder="Nouvel élément">
+        <input type="url" id="new-link" placeholder="Lien (facultatif)">
+        <button onclick="addToWishlist()">Enregistrer</button>
+    </div>
+
+    <button onclick="viewTakenItems()">Voir ce qui est déjà pris par quelqu'un d'autre</button>
+
+    <script>
+        let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+
+        function displayWishlist() {
+            const wishlistSection = document.getElementById('wishlist-section');
+            wishlistSection.innerHTML = '';
+            wishlist.forEach((item, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'wishlist-item';
+                
+                const itemText = document.createElement('span');
+                itemText.textContent = item.name;
+                itemDiv.appendChild(itemText);
+
+                if (item.link) {
+                    const itemLink = document.createElement('a');
+                    itemLink.href = item.link;
+                    itemLink.textContent = ' (Lien)';
+                    itemLink.target = '_blank';
+                    itemDiv.appendChild(itemLink);
+                }
+
+                wishlistSection.appendChild(itemDiv);
+            });
+        }
+
+        function checkPassword() {
+            const passwordInput = document.getElementById('password').value;
+            if (passwordInput === 'banane') {
+                document.getElementById('edit-section').classList.remove('hidden');
+            } else {
+                alert('Mot de passe incorrect');
+            }
+        }
+
+        function addToWishlist() {
+            const newItem = document.getElementById('new-item').value;
+            const newLink = document.getElementById('new-link').value;
+
+            if (newItem) {
+                wishlist.push({ name: newItem, link: newLink || null });
+                localStorage.setItem('wishlist', JSON.stringify(wishlist));
+                displayWishlist();
+                document.getElementById('new-item').value = '';
+                document.getElementById('new-link').value = '';
+            } else {
+                alert('Veuillez entrer un élément.');
+            }
+        }
+
+        function viewTakenItems() {
+            window.location.href = 'taken.html';
+        }
+
+        displayWishlist();
+    </script>
+</body>
+</html>
