@@ -67,6 +67,9 @@
             align-items: center;
             box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
         }
+        .taken-checkbox {
+            margin-left: 10px;
+        }
         button {
             padding: 10px 15px;
             font-size: 1em;
@@ -113,7 +116,7 @@
             <button onclick="addToWishlist()">Enregistrer</button>
         </div>
 
-        <button onclick="viewTakenItems()">Voir ce qui est déjà pris par quelqu'un d'autre</button>
+        <button id="toggle-taken-button" onclick="toggleTakenView()">Voir ce qui est déjà pris par quelqu'un d'autre</button>
     </main>
 
     <footer>
@@ -122,6 +125,7 @@
 
     <script>
         let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+        let showTakenView = false;
 
         function displayWishlist() {
             const wishlistSection = document.getElementById('wishlist-section');
@@ -142,7 +146,14 @@
                     itemDiv.appendChild(itemLink);
                 }
 
-                if (document.getElementById('edit-section').classList.contains('hidden') === false) {
+                if (showTakenView) {
+                    const takenCheckbox = document.createElement('input');
+                    takenCheckbox.type = 'checkbox';
+                    takenCheckbox.className = 'taken-checkbox';
+                    takenCheckbox.checked = item.taken || false;
+                    takenCheckbox.onchange = () => markAsTaken(index, takenCheckbox.checked);
+                    itemDiv.appendChild(takenCheckbox);
+                } else if (!document.getElementById('edit-section').classList.contains('hidden')) {
                     const deleteButton = document.createElement('button');
                     deleteButton.textContent = 'Supprimer';
                     deleteButton.style.marginLeft = '10px';
@@ -169,7 +180,7 @@
             const newLink = document.getElementById('new-link').value;
 
             if (newItem) {
-                wishlist.push({ name: newItem, link: newLink || null });
+                wishlist.push({ name: newItem, link: newLink || null, taken: false });
                 localStorage.setItem('wishlist', JSON.stringify(wishlist));
                 displayWishlist();
                 document.getElementById('new-item').value = '';
@@ -187,8 +198,18 @@
             }
         }
 
-        function viewTakenItems() {
-            window.location.href = 'taken.html';
+        function markAsTaken(index, isTaken) {
+            wishlist[index].taken = isTaken;
+            localStorage.setItem('wishlist', JSON.stringify(wishlist));
+        }
+
+        function toggleTakenView() {
+            showTakenView = !showTakenView;
+            const toggleButton = document.getElementById('toggle-taken-button');
+            toggleButton.textContent = showTakenView
+                ? 'Revenir à la liste complète'
+                : 'Voir ce qui est déjà pris par quelqu\'un d\'autre';
+            displayWishlist();
         }
 
         displayWishlist();
